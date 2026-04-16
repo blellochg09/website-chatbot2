@@ -3,63 +3,251 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chatbot</title>
+  <title>FJerry Strategy Assistant</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
+      box-sizing: border-box;
     }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
+
     #chat {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 300px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      background: white;
+      width: 380px;
+      max-width: calc(100vw - 24px);
+      height: 620px;
+      max-height: calc(100vh - 40px);
+      border: 1px solid #ddd;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
+
+    #header {
+      padding: 16px 18px;
+      border-bottom: 1px solid #eee;
+      background: #111;
+      color: white;
+    }
+
+    #headerTitle {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+
+    #headerSub {
+      font-size: 13px;
+      line-height: 1.4;
+      color: rgba(255,255,255,0.8);
+      margin: 0;
+    }
+
     #messages {
-      height: 200px;
+      flex: 1;
       overflow-y: auto;
-      margin-bottom: 10px;
-      border: 1px solid #eee;
-      padding: 5px;
+      padding: 16px;
+      background: #f7f7f8;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    input {
-      width: 70%;
+
+    .messageRow {
+      display: flex;
+      width: 100%;
+    }
+
+    .messageRow.user {
+      justify-content: flex-end;
+    }
+
+    .messageRow.bot {
+      justify-content: flex-start;
+    }
+
+    .bubble {
+      max-width: 88%;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 15px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .messageRow.user .bubble {
+      background: #111;
+      color: white;
+      border-bottom-right-radius: 6px;
+    }
+
+    .messageRow.bot .bubble {
+      background: white;
+      color: #111;
+      border: 1px solid #e6e6e6;
+      border-bottom-left-radius: 6px;
+    }
+
+    .label {
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: #777;
+      padding: 0 4px;
+    }
+
+    .typing {
+      padding: 0 16px 12px 16px;
+      font-size: 12px;
+      color: #666;
+      display: none;
+      background: #f7f7f8;
+    }
+
+    #inputWrap {
+      border-top: 1px solid #eee;
+      padding: 12px;
+      background: #fff;
+    }
+
+    #form {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #input {
+      flex: 1;
+      border: 1px solid #d8d8d8;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    #input:focus {
+      border-color: #999;
+    }
+
+    #send {
+      border: none;
+      background: #111;
+      color: white;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #send:hover {
+      opacity: 0.92;
+    }
+
+    @media (max-width: 520px) {
+      #chat {
+        right: 12px;
+        bottom: 12px;
+        width: calc(100vw - 24px);
+        height: calc(100vh - 24px);
+        max-height: calc(100vh - 24px);
+      }
     }
   </style>
 </head>
 <body>
+  <div id="chat">
+    <div id="header">
+      <div id="headerTitle">FJerry Strategy Assistant</div>
+      <p id="headerSub">Tell me what you're trying to achieve and I’ll help map out the right approach.</p>
+    </div>
 
-<div id="chat">
-  <div id="messages"></div>
-  <input id="input" placeholder="Type..." />
-  <button onclick="send()">Send</button>
-</div>
+    <div id="messages"></div>
+    <div id="typing">Thinking...</div>
 
-<script>
-  async function send() {
+    <div id="inputWrap">
+      <form id="form">
+        <input id="input" type="text" placeholder="Type your message and hit Enter..." autocomplete="off" />
+        <button id="send" type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("form");
     const input = document.getElementById("input");
     const messages = document.getElementById("messages");
+    const typing = document.getElementById("typing");
 
-    const text = input.value;
-    input.value = "";
+    function addMessage(role, text) {
+      const row = document.createElement("div");
+      row.className = "messageRow " + role;
 
-    messages.innerHTML += "<div><b>You:</b> " + text + "</div>";
+      const wrapper = document.createElement("div");
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message: text })
+      const label = document.createElement("div");
+      label.className = "label";
+      label.textContent = role === "user" ? "You" : "FJerry";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(bubble);
+      row.appendChild(wrapper);
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendMessage(text) {
+      addMessage("user", text);
+      typing.style.display = "block";
+      messages.scrollTop = messages.scrollHeight;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          addMessage("bot", "Error: " + (data.error || "Request failed"));
+          return;
+        }
+
+        addMessage("bot", data.reply || "No response generated.");
+      } catch (err) {
+        addMessage("bot", "Error connecting to server.");
+      } finally {
+        typing.style.display = "none";
+      }
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      await sendMessage(text);
     });
 
-    const data = await res.json();
-
-    messages.innerHTML += "<div><b>Bot:</b> " + data.reply + "</div>";
-  }
-</script>
-
+    window.addEventListener("load", function () {
+      addMessage("bot", "What are you trying to achieve right now?");
+    });
+  </script>
 </body>
 </html>
