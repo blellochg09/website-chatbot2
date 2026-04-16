@@ -4,14 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FJerry Strategy Assistant</title>
+
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: transparent;
     }
 
@@ -23,231 +22,193 @@
       max-width: calc(100vw - 24px);
       height: 620px;
       max-height: calc(100vh - 40px);
-      border: 1px solid #ddd;
-      border-radius: 18px;
-      background: #ffffff;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
     #header {
-      padding: 16px 18px;
-      border-bottom: 1px solid #eee;
+      padding: 16px;
       background: #111;
       color: white;
     }
 
     #headerTitle {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0 0 4px 0;
+      font-size: 17px;
+      font-weight: 600;
     }
 
     #headerSub {
       font-size: 13px;
-      line-height: 1.4;
-      color: rgba(255,255,255,0.8);
-      margin: 0;
+      opacity: 0.8;
+      margin-top: 4px;
     }
 
     #messages {
       flex: 1;
       overflow-y: auto;
       padding: 16px;
-      background: #f7f7f8;
+      background: #f6f6f7;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .messageRow {
+    .row {
       display: flex;
       width: 100%;
     }
 
-    .messageRow.user {
-      justify-content: flex-end;
-    }
-
-    .messageRow.bot {
-      justify-content: flex-start;
-    }
+    .row.user { justify-content: flex-end; }
+    .row.bot { justify-content: flex-start; }
 
     .bubble {
-      max-width: 88%;
+      max-width: 85%;
       padding: 12px 14px;
-      border-radius: 16px;
-      font-size: 15px;
+      border-radius: 14px;
+      font-size: 14px;
       line-height: 1.5;
       white-space: pre-wrap;
-      word-wrap: break-word;
     }
 
-    .messageRow.user .bubble {
+    .user .bubble {
       background: #111;
       color: white;
-      border-bottom-right-radius: 6px;
+      border-bottom-right-radius: 4px;
     }
 
-    .messageRow.bot .bubble {
+    .bot .bubble {
       background: white;
-      color: #111;
-      border: 1px solid #e6e6e6;
-      border-bottom-left-radius: 6px;
+      border: 1px solid #e5e5e5;
+      border-bottom-left-radius: 4px;
     }
 
-    .label {
-      font-size: 11px;
-      margin-bottom: 4px;
-      color: #777;
-      padding: 0 4px;
-    }
-
-    .typing {
-      padding: 0 16px 12px 16px;
+    #typing {
+      padding: 0 16px 10px;
       font-size: 12px;
-      color: #666;
+      color: #777;
       display: none;
-      background: #f7f7f8;
     }
 
     #inputWrap {
       border-top: 1px solid #eee;
       padding: 12px;
-      background: #fff;
+      background: white;
     }
 
     #form {
       display: flex;
       gap: 8px;
-      align-items: center;
     }
 
     #input {
       flex: 1;
-      border: 1px solid #d8d8d8;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
       outline: none;
     }
 
-    #input:focus {
-      border-color: #999;
-    }
-
     #send {
-      border: none;
       background: #111;
       color: white;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 14px;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
       cursor: pointer;
     }
 
-    #send:hover {
-      opacity: 0.92;
-    }
+    #send:hover { opacity: 0.9; }
 
-    @media (max-width: 520px) {
-      #chat {
-        right: 12px;
-        bottom: 12px;
-        width: calc(100vw - 24px);
-        height: calc(100vh - 24px);
-        max-height: calc(100vh - 24px);
-      }
-    }
   </style>
 </head>
 <body>
-  <div id="chat">
-    <div id="header">
-      <div id="headerTitle">FJerry Strategy Assistant</div>
-      <p id="headerSub">Tell me what you're trying to achieve and I’ll help map out the right approach.</p>
-    </div>
 
-    <div id="messages"></div>
-    <div id="typing">Thinking...</div>
-
-    <div id="inputWrap">
-      <form id="form">
-        <input id="input" type="text" placeholder="Type your message and hit Enter..." autocomplete="off" />
-        <button id="send" type="submit">Send</button>
-      </form>
-    </div>
+<div id="chat">
+  <div id="header">
+    <div id="headerTitle">FJerry Strategy Assistant</div>
+    <div id="headerSub">How can we help you?</div>
   </div>
 
-  <script>
-    const form = document.getElementById("form");
-    const input = document.getElementById("input");
-    const messages = document.getElementById("messages");
-    const typing = document.getElementById("typing");
+  <div id="messages"></div>
+  <div id="typing">Thinking...</div>
 
-    function addMessage(role, text) {
-      const row = document.createElement("div");
-      row.className = "messageRow " + role;
+  <div id="inputWrap">
+    <form id="form">
+      <input id="input" placeholder="Type your message..." autocomplete="off" />
+      <button id="send" type="submit">Send</button>
+    </form>
+  </div>
+</div>
 
-      const wrapper = document.createElement("div");
+<script>
+  const form = document.getElementById("form");
+  const input = document.getElementById("input");
+  const messages = document.getElementById("messages");
+  const typing = document.getElementById("typing");
 
-      const label = document.createElement("div");
-      label.className = "label";
-      label.textContent = role === "user" ? "You" : "FJerry";
+  function addMessage(role, text) {
+    const row = document.createElement("div");
+    row.className = "row " + role;
 
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = text;
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
 
-      wrapper.appendChild(label);
-      wrapper.appendChild(bubble);
-      row.appendChild(wrapper);
-      messages.appendChild(row);
-      messages.scrollTop = messages.scrollHeight;
-    }
+    // 🔥 improves readability (splits paragraphs)
+    bubble.innerHTML = text.replace(/\n/g, "<br>");
 
-    async function sendMessage(text) {
-      addMessage("user", text);
-      typing.style.display = "block";
-      messages.scrollTop = messages.scrollHeight;
+    row.appendChild(bubble);
+    messages.appendChild(row);
+    messages.scrollTop = messages.scrollHeight;
+  }
 
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ message: text })
-        });
+  async function sendMessage(text) {
+    addMessage("user", text);
+    typing.style.display = "block";
 
-        const data = await res.json();
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: text })
+      });
 
-        if (!res.ok) {
-          addMessage("bot", "Error: " + (data.error || "Request failed"));
-          return;
-        }
+      const data = await res.json();
 
-        addMessage("bot", data.reply || "No response generated.");
-      } catch (err) {
-        addMessage("bot", "Error connecting to server.");
-      } finally {
-        typing.style.display = "none";
+      if (!res.ok) {
+        addMessage("bot", "Something went wrong.");
+        return;
       }
+
+      addMessage("bot", data.reply || "No response.");
+    } catch (err) {
+      addMessage("bot", "Connection error.");
+    } finally {
+      typing.style.display = "none";
     }
+  }
 
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-      input.value = "";
-      await sendMessage(text);
-    });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    window.addEventListener("load", function () {
-      addMessage("bot", "What are you trying to achieve right now?");
-    });
-  </script>
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = "";
+    await sendMessage(text);
+  });
+
+  // Initial message
+  window.addEventListener("load", () => {
+    addMessage("bot", "How can we help you?");
+  });
+</script>
+
 </body>
 </html>
